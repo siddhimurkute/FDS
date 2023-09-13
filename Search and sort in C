@@ -1,0 +1,321 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Student
+{
+    int roll;
+    char name[20];
+    int marks;
+};
+
+void accept_db(struct Student S[], int n);
+void display_db(struct Student S[], int n);
+void bubble_sort(struct Student S[], int n, int sortOption);
+int binary_search_iterative(struct Student S[], int n, int key);
+int binary_search_recursive(struct Student S[], int left, int right, int key);
+void radix_sort(struct Student S[], int n);
+void insertion_sort(struct Student S[], int n);
+void selection_sort(struct Student S[], int n);
+
+int main() {
+    int n;
+    struct Student S[20];
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    accept_db(S, n);
+    display_db(S, n);
+
+    int choice;
+    while (1) {
+        printf("\nChoose an option:\n");
+        printf("1. Search\n");
+        printf("2. Bubble Sort by Roll Number\n");
+        printf("3. Bubble Sort by Name\n");
+        printf("4. Binary Search by Iterations\n");
+        printf("5. Binary Search by Recursion\n");
+        printf("6. Radix Sort by Roll Number\n");
+        printf("7. Insertion Sort\n");
+        printf("8. Selection Sort\n");
+        printf("9. Exit\n");
+        scanf("%d", &choice);
+
+        if (choice == 9) {
+            printf("Exiting...\n");
+            break;
+        }
+
+        switch (choice)
+        {
+            case 1:
+            {
+                int key;
+                printf("Enter roll number to be searched (Search): ");
+                scanf("%d", &key);
+
+                int found = 0;
+                for (int i = 0; i < n; i++)
+                {
+                    if (S[i].roll == key)
+                    {
+                        printf("Student found:\n");
+                        printf("Name: %s, Marks: %d\n", S[i].name, S[i].marks);
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    printf("Student with roll number %d not found.\n", key);
+                }
+                break;
+            }
+            case 2:
+                bubble_sort(S, n, 1); // Sort by roll number
+                printf("Students sorted by roll number.\n");
+                display_db(S, n);
+                break;
+            case 3:
+                bubble_sort(S, n, 2); // Sort by name
+                printf("Students sorted by name.\n");
+                display_db(S, n);
+                break;
+            case 4:
+            {
+                int key;
+                printf("Enter roll number to be searched (Binary Search - Iterative): ");
+                scanf("%d", &key);
+
+                int result_iterative = binary_search_iterative(S, n, key);
+                if (result_iterative != -1)
+                {
+                    printf("Student found:\n");
+                    printf("Name: %s, Marks: %d\n", S[result_iterative].name, S[result_iterative].marks);
+                }
+                else
+                {
+                    printf("Student not found.\n");
+                }
+                break;
+            }
+            case 5:
+            {
+                int key;
+                printf("Enter roll number to be searched (Binary Search - Recursive): ");
+                scanf("%d", &key);
+
+                int result_recursive = binary_search_recursive(S, 0, n - 1, key);
+                if (result_recursive != -1)
+                {
+                    printf("Student found:\n");
+                    printf("Name: %s, Marks: %d\n", S[result_recursive].name, S[result_recursive].marks);
+                }
+                else
+                {
+                    printf("Student not found.\n");
+                }
+                break;
+            }
+            case 6:
+                radix_sort(S, n);
+                printf("Students sorted by roll number using Radix Sort.\n");
+                display_db(S, n);
+                break;
+            case 7:
+                insertion_sort(S, n);
+                printf("Students sorted using Insertion Sort.\n");
+                display_db(S, n);
+                break;
+            case 8:
+                selection_sort(S, n);
+                printf("Students sorted using Selection Sort.\n");
+                display_db(S, n);
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+
+    return 0;
+}
+
+void accept_db(struct Student S[], int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("Enter the details of student %d:\n", i + 1);
+        scanf("%d %s %d", &S[i].roll, S[i].name, &S[i].marks);
+    }
+}
+
+void display_db(struct Student S[], int n)
+{
+    printf("Student Details:\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("Roll: %d, Name: %s, Marks: %d\n", S[i].roll, S[i].name, S[i].marks);
+    }
+}
+
+void bubble_sort(struct Student S[], int n, int sortOption)
+{
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - i - 1; j++)
+        {
+            int compareResult;
+            if (sortOption == 1) {
+                compareResult = S[j].roll > S[j + 1].roll;
+            } else if (sortOption == 2) {
+                compareResult = strcmp(S[j].name, S[j + 1].name) > 0;
+            }
+
+            if (compareResult)
+            {
+                struct Student temp = S[j];
+                S[j] = S[j + 1];
+                S[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int binary_search_iterative(struct Student S[], int n, int key)
+{
+    int left = 0;
+    int right = n - 1;
+
+    while (left <= right)
+    {
+        int mid = left + (right - left) / 2;
+        if (S[mid].roll == key)
+        {
+            return mid;
+        }
+        else if (S[mid].roll < key)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+    return -1; // Not found
+}
+
+int binary_search_recursive(struct Student S[], int left, int right, int key)
+{
+    if (left <= right)
+    {
+        int mid = left + (right - left) / 2;
+        if (S[mid].roll == key)
+        {
+            return mid;
+        }
+        else if (S[mid].roll < key)
+        {
+            return binary_search_recursive(S, mid + 1, right, key);
+        }
+        else
+        {
+            return binary_search_recursive(S, left, mid - 1, key);
+        }
+    }
+    return -1; // Not found
+}
+
+
+
+    // Find the maximum roll number to determine the
+	void radix_sort(struct Student S[], int n)
+	{
+	    // Find the maximum roll number to determine the number of digits
+	    int max_roll = 0;
+	    for (int i = 0; i < n; i++)
+	    {
+	        if (S[i].roll > max_roll)
+	        {
+	            max_roll = S[i].roll;
+	        }
+	    }
+
+	    // Perform Radix Sort using counting sort for each digit place
+	    int exp = 1;
+	    struct Student output[n];
+	    while (max_roll / exp > 0)
+	    {
+	        int count[10] = {0};
+
+	        // Count the occurrences of each digit at the current place
+	        for (int i = 0; i < n; i++)
+	        {
+	            count[(S[i].roll / exp) % 10]++;
+	        }
+
+	        // Calculate the cumulative count (prefix sum)
+	        for (int i = 1; i < 10; i++)
+	        {
+	            count[i] += count[i - 1];
+	        }
+
+	        // Build the output array in a stable manner
+	        for (int i = n - 1; i >= 0; i--)
+	        {
+	            output[count[(S[i].roll / exp) % 10] - 1] = S[i];
+	            count[(S[i].roll / exp) % 10]--;
+	        }
+
+	        // Copy the sorted elements back to the original array
+	        for (int i = 0; i < n; i++)
+	        {
+	            S[i] = output[i];
+	        }
+
+	        // Move to the next digit place
+	        exp *= 10;
+	    }
+	}
+
+	void insertion_sort(struct Student S[], int n)
+	{
+	    for (int i = 1; i < n; i++)
+	    {
+	        struct Student key = S[i];
+	        int j = i - 1;
+
+	        while (j >= 0 && S[j].roll > key.roll)
+	        {
+	            S[j + 1] = S[j];
+	            j--;
+	        }
+	        S[j + 1] = key;
+	    }
+	}
+
+	void selection_sort(struct Student S[], int n)
+	{
+	    for (int i = 0; i < n - 1; i++)
+	    {
+	        int min_index = i;
+	        for (int j = i + 1; j < n; j++)
+	        {
+	            if (S[j].roll < S[min_index].roll)
+	            {
+	                min_index = j;
+	            }
+	        }
+	        if (min_index != i)
+	        {
+	            struct Student temp = S[i];
+	            S[i] = S[min_index];
+	            S[min_index] = temp;
+	        }
+	    }
+	}
+
+
+
