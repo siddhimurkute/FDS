@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//Creating the struct data structure
+struct Term {
+    int coefficient;
+    int exponent;
+    struct Term* next;
+};
+
+//Creating the first term
+struct Term* createTerm(int coefficient, int exponent) {
+    struct Term* newTerm = (struct Term*)malloc(sizeof(struct Term));
+    newTerm->coefficient = coefficient;
+    newTerm->exponent = exponent;
+    newTerm->next = NULL;
+    return newTerm;
+}
+
+//Creating new term
+void addTerm(struct Term** poly, int coefficient, int exponent) {
+    struct Term* newTerm = createTerm(coefficient, exponent);
+
+    if (*poly == NULL) {
+        *poly = newTerm;
+        (*poly)->next = *poly;
+    } else {
+        struct Term* temp = *poly;
+
+        while (temp->next != *poly) {
+            temp = temp->next;
+        }
+
+        temp->next = newTerm;
+        newTerm->next = *poly;
+    }
+}
+
+//Displaying polynomials
+void displayPolynomial(struct Term* poly) {
+    if (poly == NULL) {
+        printf("Polynomial is empty.\n");
+        return;
+    }
+
+    struct Term* temp = poly;
+    do {
+        printf("%dx^%d", temp->coefficient, temp->exponent);
+        temp = temp->next;
+
+        if (temp != poly) {
+            printf(" + ");
+        }
+    } while (temp != poly);
+    printf("\n");
+}
+
+
+//Adding Polynomials:
+struct Term* addPolynomials(struct Term* poly1, struct Term* poly2) {
+    struct Term* result = NULL;
+
+    if (poly1 == NULL && poly2 == NULL) {
+        return result;
+    }
+
+    struct Term* temp1 = poly1;
+    struct Term* temp2 = poly2;
+
+    do {
+        int coeffSum = temp1->coefficient;
+        do {
+            coeffSum += temp2->coefficient;
+            temp2 = temp2->next;
+        } while (temp2 != poly2);
+
+        addTerm(&result, coeffSum, temp1->exponent);
+        temp1 = temp1->next;
+        temp2 = poly2;  
+    } while (temp1 != poly1);
+
+    return result;
+}
+
+
+//Inputting polynomials
+void inputPolynomial(struct Term** poly) {
+    int coefficient, exponent;
+    char choice;
+
+    do {
+        printf("Enter coefficient: ");
+        scanf("%d", &coefficient);
+
+        printf("Enter exponent: ");
+        scanf("%d", &exponent);
+
+        addTerm(poly, coefficient, exponent);
+
+        printf("Do you want to add another term? (y/n): ");
+        scanf(" %c", &choice);
+    } while (choice == 'y' || choice == 'Y');
+}
+
+//The code in this function gets executed:
+int main() {
+    struct Term* poly1 = NULL;
+    struct Term* poly2 = NULL;
+
+    printf("Enter terms for the first polynomial:\n");
+    inputPolynomial(&poly1);
+
+    printf("Enter terms for the second polynomial:\n");
+    inputPolynomial(&poly2);
+
+    printf("First Polynomial: ");
+    displayPolynomial(poly1);
+
+    printf("Second Polynomial: ");
+    displayPolynomial(poly2);
+
+    struct Term* result = addPolynomials(poly1, poly2);
+
+    printf("Resultant Polynomial: ");
+    displayPolynomial(result);
+
+    return 0;
+}
+
+
+
